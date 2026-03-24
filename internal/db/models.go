@@ -9,9 +9,10 @@ import (
 )
 
 type Category struct {
-	ID        string      `json:"id"`
-	Name      interface{} `json:"name"`
-	CreatedAt int64       `json:"created_at"`
+	ID        string `json:"id"`
+	Name      string `json:"name"`
+	UpdatedAt int64  `json:"updated_at"`
+	CreatedAt int64  `json:"created_at"`
 }
 
 type Task struct {
@@ -21,7 +22,6 @@ type Task struct {
 	IsCompleted sql.NullInt64  `json:"is_completed"`
 	Priority    sql.NullInt64  `json:"priority"`
 	DueDate     sql.NullInt64  `json:"due_date"`
-	CategoryID  sql.NullString `json:"category_id"`
 	UpdatedAt   int64          `json:"updated_at"`
 	CreatedAt   int64          `json:"created_at"`
 }

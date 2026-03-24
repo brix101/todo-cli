@@ -66,10 +66,9 @@ func (s *service) Create(ctx context.Context, params CreateTaskParams) (db.Task,
 			Int64: time.Now().Add(24 * time.Hour).UnixMilli(),
 			Valid: true,
 		},
-		CategoryID: sql.NullString{String: string(params.CategoryID), Valid: true},
 	})
 	if err != nil {
-		return db.Task{}, nil
+		return db.Task{}, err
 	}
 
 	s.Publish(pubsub.CreatedEvent, dbTask)

@@ -4,9 +4,8 @@ FROM tasks
 WHERE id = ? LIMIT 1;
 
 -- name: ListTasks :many
-SELECT *
-FROM tasks
-ORDER BY created_at DESC;
+SELECT * from tasks
+order by created_at desc;
 
 -- name: CreateTask :one
 INSERT INTO tasks(
@@ -16,11 +15,9 @@ INSERT INTO tasks(
   is_completed,
   priority,
   due_date,
-  category_id,
   updated_at,
   created_at
 ) VALUES (
-  ?,
   ?,
   ?,
   ?,
@@ -38,8 +35,7 @@ SET
     description = ?,
     is_completed = ?,
     priority = ?,
-    due_date = ?,
-    category_id = ?
+    due_date = ?
 WHERE id = ?
 RETURNING *;
 

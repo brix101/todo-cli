@@ -18,7 +18,6 @@ INSERT INTO tasks(
   is_completed,
   priority,
   due_date,
-  category_id,
   updated_at,
   created_at
 ) VALUES (
@@ -28,10 +27,9 @@ INSERT INTO tasks(
   ?,
   ?,
   ?,
-  ?,
   strftime('%s', 'now'),
   strftime('%s', 'now')
-) RETURNING id, title, description, is_completed, priority, due_date, category_id, updated_at, created_at
+) RETURNING id, title, description, is_completed, priority, due_date, updated_at, created_at
 `
 
 type CreateTaskParams struct {
@@ -41,7 +39,6 @@ type CreateTaskParams struct {
 	IsCompleted sql.NullInt64  `json:"is_completed"`
 	Priority    sql.NullInt64  `json:"priority"`
 	DueDate     sql.NullInt64  `json:"due_date"`
-	CategoryID  sql.NullString `json:"category_id"`
 }
 
 func (q *Queries) CreateTask(ctx context.Context, arg CreateTaskParams) (Task, error) {
@@ -52,7 +49,6 @@ func (q *Queries) CreateTask(ctx context.Context, arg CreateTaskParams) (Task, e
 		arg.IsCompleted,
 		arg.Priority,
 		arg.DueDate,
-		arg.CategoryID,
 	)
 	var i Task
 	err := row.Scan(
@@ -62,7 +58,6 @@ func (q *Queries) CreateTask(ctx context.Context, arg CreateTaskParams) (Task, e
 		&i.IsCompleted,
 		&i.Priority,
 		&i.DueDate,
-		&i.CategoryID,
 		&i.UpdatedAt,
 		&i.CreatedAt,
 	)
@@ -80,7 +75,7 @@ func (q *Queries) DeleteTask(ctx context.Context, id string) error {
 }
 
 const getTask = `-- name: GetTask :one
-SELECT id, title, description, is_completed, priority, due_date, category_id, updated_at, created_at
+SELECT id, title, description, is_completed, priority, due_date, updated_at, created_at
 FROM tasks
 WHERE id = ? LIMIT 1
 `
@@ -95,7 +90,6 @@ func (q *Queries) GetTask(ctx context.Context, id string) (Task, error) {
 		&i.IsCompleted,
 		&i.Priority,
 		&i.DueDate,
-		&i.CategoryID,
 		&i.UpdatedAt,
 		&i.CreatedAt,
 	)
@@ -103,9 +97,8 @@ func (q *Queries) GetTask(ctx context.Context, id string) (Task, error) {
 }
 
 const listTasks = `-- name: ListTasks :many
-SELECT id, title, description, is_completed, priority, due_date, category_id, updated_at, created_at
-FROM tasks
-ORDER BY created_at DESC
+SELECT id, title, description, is_completed, priority, due_date, updated_at, created_at from tasks
+order by created_at desc
 `
 
 func (q *Queries) ListTasks(ctx context.Context) ([]Task, error) {
@@ -124,7 +117,6 @@ func (q *Queries) ListTasks(ctx context.Context) ([]Task, error) {
 			&i.IsCompleted,
 			&i.Priority,
 			&i.DueDate,
-			&i.CategoryID,
 			&i.UpdatedAt,
 			&i.CreatedAt,
 		); err != nil {
@@ -148,10 +140,9 @@ SET
     description = ?,
     is_completed = ?,
     priority = ?,
-    due_date = ?,
-    category_id = ?
+    due_date = ?
 WHERE id = ?
-RETURNING id, title, description, is_completed, priority, due_date, category_id, updated_at, created_at
+RETURNING id, title, description, is_completed, priority, due_date, updated_at, created_at
 `
 
 type UpdateTaskParams struct {
@@ -160,7 +151,6 @@ type UpdateTaskParams struct {
 	IsCompleted sql.NullInt64  `json:"is_completed"`
 	Priority    sql.NullInt64  `json:"priority"`
 	DueDate     sql.NullInt64  `json:"due_date"`
-	CategoryID  sql.NullString `json:"category_id"`
 	ID          string         `json:"id"`
 }
 
@@ -171,7 +161,6 @@ func (q *Queries) UpdateTask(ctx context.Context, arg UpdateTaskParams) (Task, e
 		arg.IsCompleted,
 		arg.Priority,
 		arg.DueDate,
-		arg.CategoryID,
 		arg.ID,
 	)
 	var i Task
@@ -182,7 +171,6 @@ func (q *Queries) UpdateTask(ctx context.Context, arg UpdateTaskParams) (Task, e
 		&i.IsCompleted,
 		&i.Priority,
 		&i.DueDate,
-		&i.CategoryID,
 		&i.UpdatedAt,
 		&i.CreatedAt,
 	)

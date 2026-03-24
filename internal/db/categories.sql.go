@@ -20,23 +20,28 @@ INSERT INTO categories(
   ?,
   strftime('%s', 'now'),
   strftime('%s', 'now')
-) RETURNING id, name, created_at
+) RETURNING id, name, updated_at, created_at
 `
 
 type CreateCategoryParams struct {
-	ID   string      `json:"id"`
-	Name interface{} `json:"name"`
+	ID   string `json:"id"`
+	Name string `json:"name"`
 }
 
 func (q *Queries) CreateCategory(ctx context.Context, arg CreateCategoryParams) (Category, error) {
 	row := q.queryRow(ctx, q.createCategoryStmt, createCategory, arg.ID, arg.Name)
 	var i Category
-	err := row.Scan(&i.ID, &i.Name, &i.CreatedAt)
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.UpdatedAt,
+		&i.CreatedAt,
+	)
 	return i, err
 }
 
 const listCategories = `-- name: ListCategories :many
-SELECT id, name, created_at
+SELECT id, name, updated_at, created_at
 FROM categories
 ORDER BY name ASC
 `
@@ -50,7 +55,12 @@ func (q *Queries) ListCategories(ctx context.Context) ([]Category, error) {
 	items := []Category{}
 	for rows.Next() {
 		var i Category
-		if err := rows.Scan(&i.ID, &i.Name, &i.CreatedAt); err != nil {
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.UpdatedAt,
+			&i.CreatedAt,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
